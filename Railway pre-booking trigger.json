@@ -1,0 +1,422 @@
+{
+  "name": "Railway pre-booking trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Railway ticket pre - booking form",
+        "formDescription": "A user-friendly form designed to let passengers reserve railway tickets in advance by entering essential travel and personal details.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "placeholder": "Selvaganesh ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Gender",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Male"
+                  },
+                  {
+                    "option": "Female"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Date of Birth",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "placeholder": "selva321@gmail.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Mobile Number",
+              "fieldType": "number",
+              "placeholder": "1234567890",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "From Station",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Tirunelveli"
+                  },
+                  {
+                    "option": "Coimbatore"
+                  },
+                  {
+                    "option": "Madurai"
+                  },
+                  {
+                    "option": "Chennai"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "To Station",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": " Bangalore"
+                  },
+                  {
+                    "option": "Navi Mumbai"
+                  },
+                  {
+                    "option": "Delhi"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Journey Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Train Class",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Sleeper"
+                  },
+                  {
+                    "option": "3AC"
+                  },
+                  {
+                    "option": "2AC"
+                  },
+                  {
+                    "option": "1AC"
+                  },
+                  {
+                    "option": "AC Chair car"
+                  },
+                  {
+                    "option": "General"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Train Type Preference",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Express"
+                  },
+                  {
+                    "option": "Super Fast Express"
+                  },
+                  {
+                    "option": "Shatabdi"
+                  },
+                  {
+                    "option": "Rajdhani"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Number of Passengers",
+              "fieldType": "number",
+              "placeholder": "eg. 1 2 3",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "ID Proof Type",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "02992ede-7259-4b21-a504-03c4e8c5c980",
+      "name": "On form submission",
+      "webhookId": "db9dfa11-bbdb-4d18-98cb-e33d15359751"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email Address'] }}",
+        "subject": "=🎟️ Ticket Booked Successfully! |  {{ $json['From Station'] }} ➡️ {{ $json['To Station'] }} | {{ $json['Journey Date'] }}",
+        "message": "=<h2>Hey {{ $json['Full Name'] }}, 👋</h2>\n<p>✅ <strong>Your railway ticket has been successfully booked!</strong></p>\n\n<p>Here are your journey details — please review and keep them handy 📅</p>\n\n<hr>\n\n<h3>🚆 <u>Journey Details</u></h3>\n<ul>\n  <li><strong>Passenger Name:</strong> {{ $json['Full Name'] }}</li>\n  <li><strong>Gender:</strong> {{ $json.Gender }}</li>\n  <li><strong>Date of Birth:</strong> {{ $json['Date of Birth'] }}</li>\n  <li><strong>From:</strong>{{ $json['From Station'] }}</li>\n  <li><strong>To:</strong> {{ $json['To Station'] }}</li>\n  <li><strong>Journey Date:</strong> 🗓️ {{ $json['Journey Date'] }}</li>\n  <li><strong>Class:</strong> {{ $json['Train Class'] }} </li>\n  <li><strong>Train Type:</strong> {{ $json['Train Type Preference'] }}</li>\n  <li><strong>Number of Passengers:</strong> {{ $json['Number of Passengers'] }}</li>\n</ul>\n\n<hr>\n\n<hr>\n\n<h3>📞 <u>Contact Details</u></h3>\n<ul>\n  <li><strong>Email:</strong> selvavelayutham395@gmail.com</li>\n  <li><strong>Mobile:</strong> 9585124682</li>\n</ul>\n\n<hr>\n\n<p>Thank you for choosing our <strong>Railway Ticket Pre-Booking Service!</strong> 🚄</p>\n<p>Wishing you a safe and comfortable journey ahead. 🌟</p>\n\n<p>If you have any queries or need support, feel free to contact us anytime. 💬</p>\n\n<p>Warm regards,<br>\n<strong>Railway Ticketing Support Team</strong> 💼<br>\n<em>“Your journey, our responsibility.”</em></p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        0
+      ],
+      "id": "f93e7a47-fd60-43f8-9ea6-2321d0c05267",
+      "name": "Send a message",
+      "webhookId": "19f401d5-cb4d-4454-89ba-b0df4d1f3704",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oNYTelEz74C7ViLH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1LpOBT5C0KvmGj46bPA1tSzO6ar9sX0yYymRWeM2nWqQ",
+          "mode": "list",
+          "cachedResultName": "Railway pre- Booking Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LpOBT5C0KvmGj46bPA1tSzO6ar9sX0yYymRWeM2nWqQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LpOBT5C0KvmGj46bPA1tSzO6ar9sX0yYymRWeM2nWqQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "S.No": "1",
+            "Passenger Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Gender": "={{ $('On form submission').item.json.Gender }}",
+            "Date of Birth": "={{ $('On form submission').item.json['Date of Birth'] }}",
+            "From": "={{ $('On form submission').item.json['From Station'] }}",
+            "To": "={{ $('On form submission').item.json['To Station'] }}",
+            "Journey Date": "={{ $('On form submission').item.json['Journey Date'] }}",
+            "Class": "={{ $('On form submission').item.json['Train Class'] }}",
+            "Train Type": "={{ $('On form submission').item.json['Train Type Preference'] }}",
+            "Number of Passengers": "={{ $('On form submission').item.json['Number of Passengers'] }}",
+            "ID Proof ": "={{ $('On form submission').item.json['ID Proof Type'][0]['filename'] }}",
+            "Mobile Number": "={{ $('On form submission').item.json['Mobile Number'] }}",
+            "Email Address": "={{ $('On form submission').item.json['Email Address'] }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "S.No"
+          ],
+          "schema": [
+            {
+              "id": "S.No",
+              "displayName": "S.No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Passenger Name",
+              "displayName": "Passenger Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Gender",
+              "displayName": "Gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date of Birth",
+              "displayName": "Date of Birth",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "From",
+              "displayName": "From",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "To",
+              "displayName": "To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Journey Date",
+              "displayName": "Journey Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Class",
+              "displayName": "Class",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Train Type",
+              "displayName": "Train Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mobile Number",
+              "displayName": "Mobile Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Number of Passengers",
+              "displayName": "Number of Passengers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID Proof ",
+              "displayName": "ID Proof ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        0
+      ],
+      "id": "c7520e00-9bf2-425b-95b2-bb2aafdac466",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GzPsVETMhRk1fg3P",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Indian/Christmas",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "vtfDqsyMNNRfj1CD"
+  },
+  "versionId": "c9ebd2f0-e41f-4050-bab6-d4287e1b53d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcb3527212ab5d6a82ab87fc4680f40145a1d5c81aa809697451111f5d8209e"
+  },
+  "id": "vtfDqsyMNNRfj1CD",
+  "tags": []
+}
