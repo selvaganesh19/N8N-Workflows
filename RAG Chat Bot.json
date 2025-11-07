@@ -1,0 +1,326 @@
+{
+  "name": "RAG Chat Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "use the tool to generate answer for the questions",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        208
+      ],
+      "id": "69b71aef-a8c7-4f30-a146-976c8901f0c3",
+      "name": "Simple Vector Store1"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        -240
+      ],
+      "id": "a77bc740-95cf-4209-97a2-21442fff7611",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        256
+      ],
+      "id": "f7d0dfda-bbf2-4546-8b0f-26c96df98926",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        -464
+      ],
+      "id": "8125f2c6-bdd5-469f-963e-ae29bdeed53b",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        640,
+        432
+      ],
+      "id": "977a8495-df55-4235-8ac1-decb5a96d71d",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4QXq9NomAzqnELfx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -240
+      ],
+      "id": "d9f72693-ee26-48d3-9696-56572e0f1ef9",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4QXq9NomAzqnELfx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1JFHkLgbVjNNkIbjigU6fctsaDO220x8R",
+          "mode": "list",
+          "cachedResultName": "RAG Application",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1JFHkLgbVjNNkIbjigU6fctsaDO220x8R"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -360
+      ],
+      "id": "cd02daf9-8ec2-41b9-80e4-52d8f2047fee",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8j3fgyjeJqdoGesV",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -360
+      ],
+      "id": "1578d371-bbf5-4292-978e-95c8b019d36f",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8j3fgyjeJqdoGesV",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        208
+      ],
+      "id": "bcc1ec46-b82a-480a-9b0f-1aba1662f3ab",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4QXq9NomAzqnELfx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Retrieval-Augmented Generation (RAG) chatbot.\n\nYour primary role is to provide accurate, helpful, and context-aware responses using the information available in the connected vector store or knowledge base.\n\nCore Behavior\n\n1. Always perform a retrieval step before responding to a query.\n2. Use the retrieved information as your main source of truth.\n3. If the retrieved data is relevant and sufficient:\n   - Base your answer entirely on it.\n   - Summarize, quote, or explain the retrieved facts clearly.\n4. If the retrieved data is missing, incomplete, or uncertain:\n   - Politely inform the user that the specific information is not available in your knowledge base.\n   - If possible, provide a general or helpful response, but clearly indicate it is not from the stored data.\n5. Do not fabricate or hallucinate facts not supported by retrieved information.\n\n Response Style\n\n- Be clear, concise, and easy to understand.\n- Avoid unnecessary technical jargon unless explicitly requested.\n- Organize information with short paragraphs, bullet points, or tables when helpful.\n- Maintain a friendly, professional, and factual tone.\n- If the question is unrelated to your stored knowledge, respond politely:\n  > “That information isn’t available in my knowledge base, but here’s a general overview…”\n\nTone and Transparency\n\n- Be confident when answers are grounded in data.\n- Be transparent when unsure or when data is not available.\n- Avoid filler or speculation.\n- Always focus on being informative and user-friendly.\n\n Objective\n\nYour goal is to act as a **truthful, retrieval-grounded assistant** — combining knowledge retrieved from the vector store with your reasoning to deliver the most accurate, context-aware responses possible.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "02158244-ee0b-4429-a417-07fc05133d5b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "2586c0eb-9e36-438b-b9db-5951f9132e2f",
+      "name": "When chat message received",
+      "webhookId": "3048f882-b0b3-4b8d-a6a0-b04f643e5479"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Indian/Christmas",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "2zZXqTSZs77jX3r8"
+  },
+  "versionId": "77abfd25-8a48-486b-9f63-5355ded0e948",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcb3527212ab5d6a82ab87fc4680f40145a1d5c81aa809697451111f5d8209e"
+  },
+  "id": "2zZXqTSZs77jX3r8",
+  "tags": []
+}
