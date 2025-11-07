@@ -2,13 +2,13 @@
 
 <p align="center">
   <a href="https://github.com/selvaganesh19/N8N-Workflows/stargazers">
-    <img src="https://img.shields.io/github/stars/<username>/N8N-Workflows?style=social" alt="Stars">
+    <img src="https://img.shields.io/github/stars/selvaganesh19/N8N-Workflows?style=social" alt="Stars">
   </a>
   <a href="https://github.com/selvaganesh19/N8N-Workflows/network/members">
-    <img src="https://img.shields.io/github/forks/<username>/N8N-Workflows?style=social" alt="Forks">
+    <img src="https://img.shields.io/github/forks/selvaganesh19/N8N-Workflows?style=social" alt="Forks">
   </a>
   <a href="https://github.com/selvaganesh19//N8N-Workflows/issues">
-    <img src="https://img.shields.io/github/issues/<username>/N8N-Workflows" alt="Issues">
+    <img src="https://img.shields.io/github/issues/selvaganesh19/N8N-Workflows" alt="Issues">
   </a>
   <a href="https://github.com/selvaganesh19//N8N-Workflows/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
