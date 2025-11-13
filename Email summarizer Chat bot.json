@@ -1,0 +1,288 @@
+{
+  "name": "Email summarizer Chat bot",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Listen for incoming events').first().json.message.from.id }}"
+      },
+      "id": "ede9395f-a4b5-41e2-87f2-84b2496733d5",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1344,
+        496
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD"
+          ],
+          "readStatus": "unread",
+          "receivedAfter": "={{ new Date().toISOString().split('T')[0] + 'T00:00:00' }}\n"
+        },
+        "options": {}
+      },
+      "id": "5b50edc6-0f92-4dfb-8daf-4338e67bf784",
+      "name": "Get Email",
+      "type": "n8n-nodes-base.gmailTool",
+      "position": [
+        1520,
+        496
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "faa56223-5e4d-4cf5-a3de-b680e5a85230",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YMTN2dBzPj3Jdkpr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "c1d85471-ea97-4797-9646-72ec23eebcc5",
+      "name": "Listen for incoming events",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [
+        720,
+        144
+      ],
+      "webhookId": "322dce18-f93e-4f86-b9b1-3305519b7834",
+      "typeVersion": 1,
+      "credentials": {
+        "telegramApi": {
+          "id": "IaTLpecN7hTBIPw1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $(\"Listen for incoming events\").item.json.message.chat.id }}\n",
+        "text": "={{\n\"<b>📬 Here's your unread email summary for today (\" +\nnew Date().toISOString().split('T')[0] +\n\"):</b>\\n\\n\" +\n(\n  $node[\"AI Assistant\"].json.output || \"\"\n)\n  .replace(/[*_#>`]/g, \"\")       // remove markdown and special chars\n  .replace(/\\\\n/g, \"\\n\")         // handle escaped newlines\n  .replace(/\\n{2,}/g, \"\\n\")      // normalize line spacing\n  .split(\"\\n\")\n  .map(l => l.trim())\n  .filter(l => l.length > 0)\n  // ensure spacing between messages\n  .join(\"\\n\\n\")\n  .trim()\n}}\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "3bb78dda-387c-4f26-acb2-da5ec38ae742",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        1632,
+        288
+      ],
+      "typeVersion": 1.1,
+      "webhookId": "fb452023-8655-48d6-baa4-bcd2d7cde533",
+      "credentials": {
+        "telegramApi": {
+          "id": "IaTLpecN7hTBIPw1",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.message.text}}\n",
+        "options": {
+          "systemMessage": "=You are a helpful AI assistant integrated with Gmail and Telegram.\n\nYour job is to summarize the user's unread emails for today.\n\nRules for output:\n- For each email, display it in this exact format:\n\n📨 **<Sender>: <Subject>**\n<2-line summary of the email body>\n\n- Keep summaries clear, concise, and readable in plain text (no markdown beyond bold).\n- Separate each email summary with one blank line.\n- If no unread emails exist, say: 📭 No unread emails today.\n- Remove signatures, disclaimers, and promotional clutter."
+        }
+      },
+      "id": "2006be74-6f62-44a8-a499-a4eabc864fc1",
+      "name": "AI Assistant",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1232,
+        288
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        512
+      ],
+      "id": "1bfa8e2c-66d2-4912-8fda-b8e423672764",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4QXq9NomAzqnELfx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "83ffed1d-8730-44f9-8e57-3efb48a54d32",
+              "leftValue": "={{ $json.message.text}}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        144
+      ],
+      "id": "7b5add6d-c627-4a42-bfc7-cf593d0f159b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "👋 Hi Selva! I’m your Gmail AI Assistant.   \nYou can ask me things like: \n• Summarize my unread emails   \n• Show inbox summary for today ",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1296,
+        -16
+      ],
+      "id": "edb41383-ad0a-43b2-91b9-6893c4abffe8",
+      "name": "Send a text message",
+      "webhookId": "6653a881-4e1b-4f63-92f2-4e8528362e3e",
+      "credentials": {
+        "telegramApi": {
+          "id": "IaTLpecN7hTBIPw1",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Assistant",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listen for incoming events": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Assistant": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Assistant",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "ZML954wB0kzhZlFX"
+  },
+  "versionId": "2d36d9d1-b19f-4335-b99e-a409184932d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcb3527212ab5d6a82ab87fc4680f40145a1d5c81aa809697451111f5d8209e"
+  },
+  "id": "ZML954wB0kzhZlFX",
+  "tags": []
+}
