@@ -1,0 +1,246 @@
+{
+  "name": "Whatsapp Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        48
+      ],
+      "id": "2659a6b5-075f-4c00-8f40-f07f545848be",
+      "name": "WhatsApp Trigger",
+      "webhookId": "e5858902-9aff-4d2f-9534-22e8ddbe74fa",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "i26X8ckvBajL9kRd",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer the question:  {{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are a helpful and accurate tool-calling agent.\n\nYour primary task is to send emails using the Gmail tool. \nWhenever the user requests to send, draft, reply to, or forward an email, you MUST call the Gmail tool.\n\nWhen calling the Gmail tool, always provide:\n- \"to\": The recipient(s), inferred from user instructions.\n- \"subject\": A clear, concise, professional subject line.\n- \"email_type\": Always \"html\".\n- \"message\": A fully formatted HTML email body.\n\nEmail Content Requirements:\n1. Write the email in clean, professional, natural language.\n2. Maintain proper grammar, spelling, upper/lowercase, and punctuation.\n3. Use emojis only where appropriate to match tone (e.g., friendly emails may include 😊; business emails should avoid unnecessary emojis).\n4. Use HTML formatting such as:\n   - <p> … </p>\n   - <strong> … </strong>\n   - <br>\n   - <ul> / <li>\n   - <h3> (for small headings if needed)\n5. Make sure the email feels human-written, well-structured, and personalized based on the user's instruction.\n\nBehavior Rules:\n6. Only output a Gmail tool call when sending an email. \n   Do NOT output raw text, JSON, or explanations — only the tool call.\n7. After the Gmail tool call completes, send a normal AI message to the user:\n   - Confirm that the email has been sent.\n   - Provide a short, clear status update.\n8. If the user requests anything unrelated to sending an email, respond normally.\n\nTrigger Phrases (examples):\n- “Send an email…”\n- “Reply to this email…”\n- “Draft an email to…”\n- “Forward this message…”\n- “Write a mail to…”\n\nAlways ensure the final result is a valid Gmail tool call followed by a confirmation message.\nAll responses after sending must be neutral, helpful, and concise.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        0,
+        32
+      ],
+      "id": "315ffc38-b852-4f40-a0e9-5a77defef283",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "786240737911516",
+        "recipientPhoneNumber": "917708574634",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        432,
+        32
+      ],
+      "id": "175ba67c-00a9-42f2-a45b-5e213f95a2dd",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "a3548bef-5c0c-4bee-a773-2126efa25975",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "IX50VF2DoZkHJLvs",
+          "name": "WhatsApp account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1026125c-1cb5-4158-92a1-7af6bdfa6270",
+              "leftValue": "={{ $json.messages[0].from }}",
+              "rightValue": "917708574634",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        48
+      ],
+      "id": "92f312a8-b3f2-491a-acdc-31f09379265b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        272
+      ],
+      "id": "e25e1ff6-1d53-48a7-bf42-2180874591c5",
+      "name": "Gmail Agent",
+      "webhookId": "72c0b3f3-88b2-4932-9354-8fb6837c39bb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YMTN2dBzPj3Jdkpr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        272
+      ],
+      "id": "fc16de93-82bb-48a7-8c16-ce88525955bb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4QXq9NomAzqnELfx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=whatsapp_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        272
+      ],
+      "id": "1d620f30-68d8-434c-aaf4-40f75f8a331e",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Gmail Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false,
+    "errorWorkflow": "wFH3hwpxNuBnC5v6"
+  },
+  "versionId": "2b93c509-2dea-4986-89a4-0e93761b7510",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcb3527212ab5d6a82ab87fc4680f40145a1d5c81aa809697451111f5d8209e"
+  },
+  "id": "wFH3hwpxNuBnC5v6",
+  "tags": []
+}
